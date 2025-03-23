@@ -4,8 +4,6 @@ import ProgressView from "../viewInterfaces/Progress";
 const ProgressComponent: ReflowReactComponentFunction<ProgressView> = ({
 	progress,
 	finished,
-	//done,
-	//event
 }) => {
 
 	if (finished) {

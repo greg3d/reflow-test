@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@mcesystems/reflow": "^6.0.0",
-    "@mcesystems/reflow-react-display-layer": "file:../reflow/packages/reflow-react-display-layer"
+    "@mcesystems/reflow-react-display-layer": "^6.0.0"
 
   }
 }

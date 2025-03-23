@@ -12,8 +12,8 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       '@mcesystems/reflow-react-display-layer':
-        specifier: file:../reflow/packages/reflow-react-display-layer
-        version: file:../reflow/packages/reflow-react-display-layer
+        specifier: ^6.0.0
+        version: 6.0.0
     devDependencies:
       '@types/react':
         specifier: ^18
@@ -180,8 +180,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@mcesystems/reflow-react-display-layer@file:../reflow/packages/reflow-react-display-layer':
-    resolution: {directory: ../reflow/packages/reflow-react-display-layer, type: directory}
+  '@mcesystems/reflow-react-display-layer@6.0.0':
+    resolution: {integrity: sha512-VTo9yJpskLsJzzwCsaiGH/1bd1e2XJ+Et2RYu6L+4gL/mgQgqZAwpcujMr7XcuyVALcX29QRzMxTFPibxwZRFg==}
 
   '@mcesystems/reflow@6.0.0':
     resolution: {integrity: sha512-GgT+XnL2tFk9Mzic3OaSdg0edkHfR5INddxFySOkunoE0gPBb/ZBqg04Ij1ihZleg1dVCwu1Sg8G2FO1C5rRTA==}
@@ -581,7 +581,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.1':
     optional: true
 
-  '@mcesystems/reflow-react-display-layer@file:../reflow/packages/reflow-react-display-layer':
+  '@mcesystems/reflow-react-display-layer@6.0.0':
     dependencies:
       '@mcesystems/reflow': 6.0.0
       react: 16.14.0
