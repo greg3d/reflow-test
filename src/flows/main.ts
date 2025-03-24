@@ -1,5 +1,6 @@
 import {Flow, ViewInterface, ViewProxy, ViewsMapInterface} from '@mcesystems/reflow';
 import {ViewInterfacesType} from '../viewInterfaces';
+import ComplexComponent from '../viewInterfaces/ComplexComponent.ts';
 
 /*
 type FlowInput = Record<never, never>;
@@ -33,43 +34,59 @@ const childFlow = <Flow<ViewInterfacesType, void, void, {}, {}, ChildFlowEvents>
 	event("finished", true)
 });*/
 
-interface Task<T extends ViewInterface<any, any, any>, K extends keyof T['input']> {
+export interface Task<T extends ViewInterface<any, any, any>, K extends keyof T['input']> {
+    key: K;
     thread: () => Promise<T['input'][K]>;
     cb: (result: T['input'][K], view: ViewProxy<ViewsMapInterface, T>) => void;
 }
 
 export class Deferred<T extends ViewInterface<any, any, any>> {
-    list: Partial<{ [K in keyof T['input']]: Task<T, K> }>;
+    private readonly tasks: Partial<Record<keyof T['input'], Task<T, keyof T['input']>>>;
+    private observerLoadingState: Record<string, 'idle' | 'busy' | undefined>;
+
+    //private readonly view: ViewProxy<ViewsMapInterface, T>;
 
     constructor() {
-        this.list = {};
+        this.tasks = {};
+        this.observerLoadingState = {};
     }
 
-    add<K extends keyof T['input']>(
-        key: K,
+    public add<K extends keyof T['input']>(
+        key: string,
         thread: () => Promise<T['input'][K]>,
         cb: (result: T['input'][K], view: ViewProxy<ViewsMapInterface, T>) => void
-    ) {
-        this.list[key] = {thread, cb};
+    ): void {
+        this.tasks[key] = {key, thread, cb};
+        this.observerLoadingState[key] = 'idle';
     }
 
-    getObserverLoadingState(): Record<keyof T['input'], 'idle' | 'busy'> {
-        const state: Partial<Record<keyof T['input'], 'idle' | 'busy'>> = {};
-        (Object.keys(this.list) as (keyof T['input'])[]).forEach(key => {
-            state[key] = 'idle';
-        });
-        return state as Record<keyof T['input'], 'idle' | 'busy'>;
+    // initial view state
+    getInitialObserverLoadingState() {
+        return {
+            observerLoadingState: this.observerLoadingState
+        };
     }
 
-    run(view: ViewProxy<ViewsMapInterface, T>) {
-        Object.values(this.list).forEach(task => {
-            // Убедимся, что task не undefined
-            if (task) {
-                task.thread().then(result => {
-                    task.cb(result, view);
-                });
-            }
-        });
+    public run(view: ViewProxy<ViewsMapInterface, T>): void {
+        for (const key in this.tasks) {
+            const task = this.tasks[key as keyof T['input']];
+            if (!task) continue;
+
+            // update state of loading = busy
+            this.observerLoadingState = {...this.observerLoadingState, [key]: 'busy'};
+            view.update({ observerLoadingState: this.observerLoadingState });
+
+            // after
+            task.thread().then(result => {
+                // update state of loading = idle
+                this.observerLoadingState = {...this.observerLoadingState, [key]: 'idle'};
+                view.update({ observerLoadingState: this.observerLoadingState });
+                // user's callback with view
+                task.cb(result, view);
+            }).catch(error => {
+                console.error(error);
+            });
+        }
     }
 }
 
@@ -77,23 +94,31 @@ export class Deferred<T extends ViewInterface<any, any, any>> {
 const mainFlow = <Flow<ViewInterfacesType>>(async (toolkit) => {
 
     const {view, views, event, step, back, backPoint, flow} = toolkit;
+    console.log('Flow started');
 
-
-    const deferred = new Deferred();
-    deferred.add<string>('title',
+    const deferred = new Deferred<ComplexComponent>();
+    deferred.add('title',
         () => new Promise((resolve) => setTimeout(() => resolve('Title 11231'), 1000)),
         (result, view) => {
+            view.update({
+                title: result
+            });
+        });
 
+    deferred.add('subtitle',
+        () => new Promise((resolve) => setTimeout(() => resolve('Subtitl e 23 23 '), 2500)),
+        (result, view) => {
+            view.update({
+                subtitle: result
+            });
         });
 
 
-    const viewInstance = view(0, views.ComplexComponent, {
-        observerLoadingState: {
-            title: 'idle'
-        }
-    });
+    const viewInstance = view(0, views.ComplexComponent, deferred.getInitialObserverLoadingState());
+    console.log(viewInstance);
+    deferred.run(viewInstance);
 
-    console.log('Flow started');
+    //await viewInstance;
 
     /*
     const child1 = flow(childFlow)
