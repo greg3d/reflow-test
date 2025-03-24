@@ -8,7 +8,6 @@ export interface ISensor {
     value: number;
 }
 
-
 export interface Input {
     title?: string;
     subtitle?: string;
@@ -26,7 +25,7 @@ export interface Input {
     };
 }
 
-export interface InputObserved extends Input {
+export interface LoadingState {
     observerLoadingState: {
         [K in keyof Input]: "idle" | "busy" | undefined;
     }
@@ -38,7 +37,6 @@ export interface Events {
     resetClicked: () => void;
 }
 
-
-export default interface ComplexComponent extends ViewInterface<InputObserved, Events> {
+export default interface ComplexComponent extends ViewInterface<Input, Events> {
 }
 
