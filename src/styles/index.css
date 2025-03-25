@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/optional/presets';
+@import '@skeletonlabs/skeleton/themes/cerberus';
+
+@source '../../node_modules/@skeletonlabs/skeleton-react/dist';
+
+.skeleton {
+	width: 100%;
+	height: 100%;
+	background-color: #373737;
+	border-radius: 4px;
+	font-size: 10px;
+	animation: skeleton-animation 1s infinite;
+	text-align: center;
+	padding: 5px;
+}
+
+@keyframes skeleton-animation {
+	0% {
+		opacity: 0.3;
+	}
+	50% {
+		opacity: 0.9;
+	}
+	100% {
+		opacity: 0.3;
+	}
+}
+
+.additional {
+	font-size: 12px;
+
+	color: #a2a2a2;
+}

@@ -23,11 +23,14 @@ export interface Input {
             value: number
         }
     };
+    additional?: Record<string, string>;
 }
 
-export interface LoadingState {
-    observerLoadingState: {
-        [K in keyof Input]: "idle" | "busy" | undefined;
+export type LoadingType = "idle" | "busy" | undefined;
+
+export interface LoadingState<T> {
+    loadingState: {
+        [K in keyof T]: LoadingType;
     }
 }
 
@@ -37,6 +40,6 @@ export interface Events {
     resetClicked: () => void;
 }
 
-export default interface ComplexComponent extends ViewInterface<Input, Events> {
+export default interface ComplexComponent extends ViewInterface<Input & LoadingState<Input>, Events> {
 }
 
